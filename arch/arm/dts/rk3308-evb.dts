@@ -71,9 +71,9 @@
 	};
 
 	backlight: backlight {
-		status = "disabled";
+		status = "okay";
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 25000 0>;
+		pwms = <&pwm1 0 2000000 0>;
 		brightness-levels = <
 			  0   1   2   3   4   5   6   7
 			  8   9  10  11  12  13  14  15
@@ -110,7 +110,7 @@
 		default-brightness-level = <200>;
 	};
 
-	panel: panel {
+	panel_spi: panel_spi {
 		compatible = "simple-panel";
 		bus-format = <MEDIA_BUS_FMT_RGB666_1X18>;
 		backlight = <&backlight>;
@@ -257,6 +257,105 @@
 		};
 	};
 
+	panel_mdk: panel_mdk {
+		compatible = "simple-panel";
+		bus-format = <MEDIA_BUS_FMT_RGB666_1X18>;
+		backlight = <&backlight>;
+		/* enable-gpios = <&gpio0 RK_PB7 GPIO_ACTIVE_LOW>; */
+		/* enable-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>; */
+		enable-delay-ms = <20>;
+		reset-gpios = <&gpio0 RK_PC4 GPIO_ACTIVE_LOW>;
+		reset-value = <0>;
+		reset-delay-ms = <10>;
+		prepare-delay-ms = <20>;
+		unprepare-delay-ms = <20>;
+		disable-delay-ms = <20>;
+		width-mm = <217>;
+		height-mm = <136>;
+		rockchip,data-mapping = "vesa";
+		rockchip,data-width = <18>;
+		rockchip,output = "rgb";
+		rgb-mode = "p666";
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&lcdc_ctl>;
+
+		display-timings {
+			native-mode = <&mdk1024600_timing>;
+
+			mdk1024600_timing: timing0 {
+				clock-frequency = <51200000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hback-porch = <140>;
+				hfront-porch = <160>;
+				vback-porch = <20>;
+				vfront-porch = <12>;
+				hsync-len = <20>;
+				vsync-len = <3>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <1>;
+			};
+
+			mdk800480_timing: timing1 {
+				clock-frequency = <33000000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <40>;
+				hfront-porch = <40>;
+				vback-porch = <29>;
+				vfront-porch = <13>;
+				hsync-len = <48>;
+				vsync-len = <3>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <1>;
+			};
+
+			mdk480272_timing: timing2 {
+				clock-frequency = <9000000>;
+				hactive = <480>;
+				vactive = <272>;
+				hback-porch = <2>;
+				hfront-porch = <2>;
+				vback-porch = <2>;
+				vfront-porch = <2>;
+				hsync-len = <41>;
+				vsync-len = <10>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <1>;
+			};
+
+
+			mdk320480_timing: timing3 {
+				clock-frequency = <11000000>;
+				hactive = <320>;
+				vactive = <480>;
+				hback-porch = <10>;
+				hfront-porch = <4>;
+				vback-porch = <10>;
+				vfront-porch = <4>;
+				hsync-len = <20>;
+				vsync-len = <20>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <0>;
+				pixelclk-active = <0>;
+			};
+		};
+
+		port {
+			panel_mdk_in_rgb: endpoint {
+				remote-endpoint = <&rgb_out_panel>;
+			};
+		};
+	};
+
 	vdd_log: vdd_core: vdd-core {
 		compatible = "pwm-regulator";
 		pwms = <&pwm0 0 5000 1>;
@@ -272,7 +371,7 @@
 };
 
 &display_subsystem {
-	status = "disabled";
+	status = "okay";
 };
 
 &emmc {
@@ -288,7 +387,7 @@
 };
 
 &pwm1 {
-	status = "disabled";
+	status = "okay";
 };
 
 &u2phy {
@@ -316,15 +415,15 @@
 };
 
 &route_rgb {
-	status = "disabled";
+	status = "okay";
 };
 
 &vop {
-	status = "disabled";
+	status = "okay";
 };
 
 &rgb {
-	status = "disabled";
+	status = "okay";
 
 	ports {
 		rgb_out: port@1 {
@@ -334,10 +433,16 @@
 
 			rgb_out_panel: endpoint@0 {
 				reg = <0>;
-				remote-endpoint = <&panel_in_rgb>;
+				remote-endpoint = <&panel_mdk_in_rgb>;
 			};
 		};
 	};
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart2m0_xfer>;
+	status = "okay";
 };
 
 &pinctrl {
